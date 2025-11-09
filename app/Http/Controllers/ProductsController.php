@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use Illuminate\Http\Request;
+use App\Repositories\Uploads\ImagenRepository;
+
+class ProductsController extends Controller
+{
+    public function __construct(
+       // protected ProductRepositoryInterface $productRepository,
+      //  protected ImagenRepository $imagenRepository
+    ) {
+    }
+    public function showAll(Request $request){
+        return Product::all();
+    }
+    public function store(Request $request){
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'stock' => 'required|integer|min:0',
+            'description' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'image' => 'sometimes|image',
+        ]);
+        $coupon = Product::create($validatedData);
+
+
+        return response()->json($coupon, 201);
+    }
+    public function destroy(Request $request, $id){
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+        $product->delete();
+        return response()->json(['message' => 'Product deleted']);
+    }
+    public function update(Request $request, $id){
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+        $product->update($request->all());
+        return response()->json($product);
+    }
+
+
+    public function show(Request $request, $id){
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+        return response()->json($product);
+    }
+
+    public function stock(Request $request, $id){
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+        return response()->json($product->stock);
+    }
+
+    public function image(Request $request, ImagenRepository $imagenRepository)
+    {
+        $request->validate([
+            'cover' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $filePath = $imagenRepository->uploadPublicImage($request);
+
+        return response()->json(['file_path' => $filePath], 201);
+    }
+}
