@@ -13,13 +13,8 @@ class AddressResource extends JsonResource
         return [
             'id' => $this->id,
             'attributes' => [
-                'street'      => $this->street,
-                'city'        => $this->city,
-                'state'       => $this->state,
-                'zip_code' => $this->zip_code,
-                'country'     => $this->country,
-                'number' => $this->number,
-                'is_default'  => (bool) $this->is_default,
+                'longitude' =>$this->longitude,
+                'latitude' =>$this->latitude,
             ],
             'meta' => [
                 'created_at' => $this->created_at->toIso8601String(),

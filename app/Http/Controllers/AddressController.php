@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
-use App\Http\Requests\StoreAddressRequest;
-use App\Http\Requests\UpdateAddressRequest;
 use App\Http\Resources\AddressResource;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 
@@ -19,15 +19,25 @@ class AddressController extends Controller
     }
 
 
-    public function store(StoreAddressRequest $request)
+    public function store(Request $request)
     {
         try {
-            $address = Auth::user()->addresses()->create($request->validated());
-            return (new AddressResource($address))->response()->setStatusCode(201);
+            $data = $request->validate([
+                'latitude'  => ['required','numeric','between:-90,90'],
+                'longitude' => ['required','numeric','between:-180,180'],
+            ]);
+
+            $address = Auth::user()->addresses()->create($data);
+
+
+            return (new AddressResource($address))
+                ->response()
+                ->setStatusCode(201);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response($e->getMessage(), 400);
         }
     }
+
 
 
     public function show(Address $address)

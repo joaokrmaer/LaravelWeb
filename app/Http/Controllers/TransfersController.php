@@ -7,7 +7,7 @@ use App\Models\Active;
 
 class TransfersController extends Controller
 {
-    public function transfer(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'from_user' => 'required|exists:users,id',
